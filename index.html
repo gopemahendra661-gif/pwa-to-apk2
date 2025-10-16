@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Website to APK Converter</title>
+<style>
+body{font-family:sans-serif;text-align:center;padding:40px;background:#141E30;color:white;}
+input,button{padding:10px;margin:6px;border-radius:8px;border:none;}
+button{background:#00c6ff;cursor:pointer;}
+a{color:#00c6ff}
+</style>
+</head>
+<body>
+<h1>🌐 Website to APK Converter</h1>
+<input type="url" id="url" placeholder="अपनी वेबसाइट का URL डालें (https://...)" size="40">
+<button id="btn">Convert</button>
+<p id="result"></p>
+
+<script>
+const btn = document.getElementById('btn');
+btn.addEventListener('click', async () => {
+  const url = document.getElementById('url').value.trim();
+  if (!url) return alert('कृपया URL डालें!');
+  document.getElementById('result').innerText = '⏳ Workflow trigger हो रहा है...';
+
+  try {
+    const resp = await fetch('https://YOUR_PROXY_DOMAIN/trigger-workflow', { // <-- change here
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ manifest: url.endsWith('/manifest.json') ? url : (url.replace(/\/$/, '') + '/manifest.json') })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      document.getElementById('result').innerHTML = '✅ Workflow triggered! GitHub → Actions → Artifacts में जाकर APK डाउनलोड करें।';
+    } else {
+      document.getElementById('result').innerText = '❌ Error: ' + (data.error || JSON.stringify(data));
+    }
+  } catch (e) {
+    document.getElementById('result').innerText = '⚠️ Network Error: ' + e.message;
+  }
+});
+</script>
+</body>
+</html>
